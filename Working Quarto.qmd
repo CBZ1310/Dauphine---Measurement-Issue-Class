@@ -1,0 +1,41 @@
+---
+title: "Graphs"
+format: html
+editor: visual
+---
+
+## Libraries
+
+```{r}
+
+here::i_am("Dauphine---Measurement-Issue-Class.Rproj")
+library(here)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(plotly)
+```
+
+## Merging the two datasets
+
+```{r}
+#Import of the data
+IVAL_indic <- read_delim("Data/fr-en-indicateurs-de-resultat-des-lycees-denseignement-general-et-technologique.csv", delim = ";", escape_double = FALSE, trim_ws = TRUE)
+IPS_indic <- read_delim("Data/fr-en-ips_lycees.csv",  delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+#Selection of data on the Paris departement
+
+IVAL_indic_Paris <- IVAL_indic %>% filter(Departement == "PARIS")
+IPS_indic_Paris <- IPS_indic %>% filter(Département == "PARIS")
+
+#Creation of tbe column "année" (year)
+IPS_indic_Paris$Annee <- substr(IPS_indic_Paris$"Rentrée scolaire", start = 6, stop = nchar(IPS_indic_Paris$"Rentrée scolaire"))
+
+# Convertir la colonne "Annee" en chiffre
+IPS_indic_Paris$Annee <- as.numeric(IPS_indic_Paris$Annee)
+
+
+#Fusion
+Data_merge <- left_join(IVAL_indic_Paris, IPS_indic_Paris, by = c("UAI", "Annee"))
+```
